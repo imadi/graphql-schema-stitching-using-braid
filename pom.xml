@@ -12,12 +12,24 @@
     <artifactId>graphql-schema-stitching</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>graphql</name>
-    <description>Demo project for Graph Spring Boot</description>
+    <description>Demo project for Graphql schema stitching Spring Boot</description>
 
     <properties>
         <java.version>1.8</java.version>
         <kotlin.version>1.3.10</kotlin.version>
     </properties>
+    <repositories>
+        <repository>
+            <id>Atassian</id>
+            <name>Atlassian</name>
+            <url>http://packages.atlassian.com/maven/public</url>
+        </repository>
+        <repository>
+            <id>Atassian Snapshot</id>
+            <name>Atlassian Snapshot</name>
+            <url>http://packages.atlassian.com/maven/public-snapshot</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -37,8 +49,8 @@
         <dependency>
             <groupId>com.atlassian.braid</groupId>
             <artifactId>graphql-braid</artifactId>
-            <version>0.23.0</version>
-          </dependency>
+            <version>0.22.0</version>
+        </dependency>
         <dependency>
           <groupId>com.squareup.okhttp3</groupId>
           <artifactId>okhttp</artifactId>
