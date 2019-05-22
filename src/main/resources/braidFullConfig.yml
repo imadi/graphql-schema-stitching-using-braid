@@ -1,0 +1,41 @@
+schemaSources:
+  - namespace: "users"
+    url: http://localhost:8080/graphql
+    schema: |
+      schema {
+        query: Query
+      }
+      type Query {
+        userById(id: ID): User
+        users: [User]
+      }
+      type User {
+        id: ID
+        name: String
+        bookId: ID
+      }
+    complexLinks:
+      - sourceType: User
+        field: book
+        targetNamespace: books
+        targetType: Book
+        topLevelQueryField: bookById
+        arguments:
+          - sourceName: bookId
+            argumentSource: OBJECT_FIELD
+            queryArgumentName: id
+  - namespace: "books"
+    url: http://localhost:8081/graphql
+    schema: |
+      schema {
+        query: Query
+      }
+      type Query {
+          bookById(id: ID): Book
+          books: [Book]
+      }
+
+      type Book {
+          id: ID
+          name: String
+      }

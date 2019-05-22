@@ -1,0 +1,12 @@
+schemaSources:
+  - namespace: "users"
+    complexLinks:
+      - sourceType: User
+        field: book
+        targetNamespace: books
+        targetType: Book
+        topLevelQueryField: bookById
+        arguments:
+          - sourceName: bookId
+            argumentSource: OBJECT_FIELD
+            queryArgumentName: id
