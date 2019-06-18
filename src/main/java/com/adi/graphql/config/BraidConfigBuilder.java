@@ -16,7 +16,7 @@ public class BraidConfigBuilder {
     private List<SchemaSource> schemaSourceList;
 
     @Bean
-    public BraidGraphQL graphQL(){
+    public BraidGraphQL graphQL() {
         return Braid.builder().schemaSources(schemaSourceList).build().newGraphQL();
     }
 

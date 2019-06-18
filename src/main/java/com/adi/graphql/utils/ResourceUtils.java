@@ -12,7 +12,8 @@ import java.util.Map;
 
 public class ResourceUtils {
 
-    private ResourceUtils() {}
+    private ResourceUtils() {
+    }
 
     public static Reader getResourceAsReader(String schemaPath) {
         try {

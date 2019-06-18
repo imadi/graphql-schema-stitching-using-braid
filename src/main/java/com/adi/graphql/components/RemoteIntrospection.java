@@ -1,55 +1,43 @@
 package com.adi.graphql.components;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
 import graphql.introspection.IntrospectionResultToSchema;
 import graphql.language.Document;
 import graphql.schema.idl.SchemaPrinter;
-import lombok.extern.slf4j.Slf4j;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
-@Slf4j
 public class RemoteIntrospection {
 
-    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private final WebClient webClient;
 
-    private final String url;
-
-    public RemoteIntrospection(String url) {
-        this.url = url;
+    public RemoteIntrospection(String url, WebClient.Builder webClientConfigBuilder) {
+        this.webClient = webClientConfigBuilder.baseUrl(url).build();
     }
 
     public Reader get() {
-        Gson gson = new Gson();
-        OkHttpClient client = new OkHttpClient();
-
-        Map<String, String> bodyMap = ImmutableMap.of("query", introspectionQuery());
-
-        String json = gson.toJson(bodyMap);
-        RequestBody body = RequestBody.create(JSON, json);
-        Request request = new Request.Builder()
-                .url(url)
-                .post(body)
-                .build();
-
         try {
-            Response response = client.newCall(request).execute();
-            Map<String, Object> introspectionResult = gson.fromJson(response.body().string(), HashMap.class);
-            Document schema = new IntrospectionResultToSchema().createSchemaDefinition((Map<String, Object>) introspectionResult.get("data"));
-            String printedSchema = new SchemaPrinter().print(schema);
-            return new StringReader(printedSchema);
-        } catch (IOException ex) {
-            System.out.println(ex);
+            return webClient.post()
+                    .header(HttpHeaders.CONTENT_TYPE, org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+                    .syncBody(Collections.singletonMap("query", introspectionQuery()))
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .flatMap(introspectionResult -> {
+                        Document schema = new IntrospectionResultToSchema().createSchemaDefinition((Map<String, Object>) introspectionResult.get("data"));
+                        String printedSchema = new SchemaPrinter().print(schema);
+                        return Mono.just(new StringReader(printedSchema));
+                    }).toFuture().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return new StringReader("");
+        } catch (ExecutionException e) {
+            e.printStackTrace();
             return new StringReader("");
         }
     }

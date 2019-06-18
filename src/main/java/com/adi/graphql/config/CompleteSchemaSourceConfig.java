@@ -6,7 +6,9 @@ import com.atlassian.braid.java.util.BraidMaps;
 import com.atlassian.braid.java.util.BraidObjects;
 import com.atlassian.braid.source.QueryExecutorSchemaSource;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Map;
@@ -14,19 +16,16 @@ import java.util.stream.Collectors;
 
 import static com.adi.graphql.utils.ResourceUtils.getResourceAsReader;
 import static com.adi.graphql.utils.ResourceUtils.loadYamlMap;
-import static com.atlassian.braid.source.yaml.YamlRemoteSchemaSourceBuilder.buildDocumentMapperFactory;
-import static com.atlassian.braid.source.yaml.YamlRemoteSchemaSourceBuilder.buildExtensions;
-import static com.atlassian.braid.source.yaml.YamlRemoteSchemaSourceBuilder.buildLinks;
-import static com.atlassian.braid.source.yaml.YamlRemoteSchemaSourceBuilder.buildMutationAliases;
-import static com.atlassian.braid.source.yaml.YamlRemoteSchemaSourceBuilder.buildQueryFieldRenames;
-import static com.atlassian.braid.source.yaml.YamlRemoteSchemaSourceBuilder.buildSchemaLoader;
-import static com.atlassian.braid.source.yaml.YamlRemoteSchemaSourceBuilder.buildSchemaNamespace;
-import static com.atlassian.braid.source.yaml.YamlRemoteSchemaSourceBuilder.buildTypeRenames;
+import static com.atlassian.braid.source.yaml.YamlRemoteSchemaSourceBuilder.*;
 import static java.util.Collections.emptyList;
 
 //@Configuration
 @Data
 public class CompleteSchemaSourceConfig {
+
+
+    @Autowired
+    private WebClient.Builder webClientConfigBuilder;
 
     @Bean
     public List<SchemaSource> schemaSourceList() {
@@ -50,7 +49,7 @@ public class CompleteSchemaSourceConfig {
     }
 
     private RemoteRetriever getRemoteRetriever(String url) {
-        return new RemoteRetriever(url);
+        return new RemoteRetriever(url, webClientConfigBuilder);
     }
 
 }

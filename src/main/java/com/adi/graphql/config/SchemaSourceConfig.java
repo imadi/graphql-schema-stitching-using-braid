@@ -10,8 +10,10 @@ import com.atlassian.braid.java.util.BraidObjects;
 import com.atlassian.braid.source.QueryExecutorSchemaSource;
 import com.atlassian.braid.source.yaml.YamlRemoteSchemaSourceBuilder;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.annotation.PostConstruct;
 import java.util.Collection;
@@ -27,6 +29,8 @@ import static com.adi.graphql.utils.ResourceUtils.loadYamlMap;
 @Data
 public class SchemaSourceConfig {
 
+    @Autowired
+    private WebClient.Builder webClientConfigBuilder;
 
     private static final String USERS_SCHEMA_URL = "http://localhost:8080/graphql"; //This one can be read from config
 
@@ -60,8 +64,8 @@ public class SchemaSourceConfig {
 
     private SchemaSource querySchemaSourceBuilder(String namespace, String schemaUrl, List<Link> links) {
         return QueryExecutorSchemaSource.builder().namespace(SchemaNamespace.of(namespace))
-                .schemaProvider(() -> new RemoteIntrospection(schemaUrl).get())
-                .remoteRetriever(new RemoteRetriever<>(schemaUrl))
+                .schemaProvider(() -> new RemoteIntrospection(schemaUrl, webClientConfigBuilder).get())
+                .remoteRetriever(new RemoteRetriever<>(schemaUrl, webClientConfigBuilder))
                 .links(links)
                 .build();
     }
