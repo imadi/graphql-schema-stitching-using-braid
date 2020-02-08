@@ -1,4 +1,4 @@
-# graphql-schema-stitching
+# graphql-schema-stitching-using-braid
 
 This service stitches the schema from two different services using graphql braid.
 
